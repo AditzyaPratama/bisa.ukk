@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Peminjaman Buku</title>
+    
+    <!-- Hubungkan file CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h2>Form Peminjaman Buku</h2>
+
+    <form id="formPeminjaman">
+        <label>Kode Pinjam:</label>
+        <input type="text" id="kodePinjam" required>
+
+        <label>Nama Peminjam:</label>
+        <input type="text" id="nama" required>
+
+        <!-- BUKU 1 -->
+        <label>ISBN/Barcode Buku 1:</label>
+        <input type="text" id="isbn1" required>
+
+        <label>Judul Buku 1:</label>
+        <input type="text" id="judul1" required>
+
+        <label>Penerbit Buku 1:</label>
+        <input type="text" id="penerbit1" required>
+
+        <label>Tahun Terbit Buku 1:</label>
+        <input type="number" id="tahunTerbit1" min="1900" max="2099" required>
+
+        <!-- UPLOAD FOTO BUKU 1 -->
+        <div class="upload-container">
+            <label class="upload-label">📷 FOTO BUKU 1</label>
+            <input type="file" id="fotoBuku1" class="file-input" accept="image/*" onchange="previewFoto(this, 'preview1')">
+            <img id="preview1" class="preview-image" alt="Preview Foto Buku 1">
+        </div>
+
+        <!-- CONTAINER UNTUK BUKU 2 -->
+        <div id="buku2Container" class="buku2-container">
+            <div class="info-buku2">📚 DATA BUKU KEDUA</div>
+            
+            <label>ISBN/Barcode Buku 2:</label>
+            <input type="text" id="isbn2" placeholder="Kosongkan jika hanya 1 buku">
+
+            <label>Judul Buku 2:</label>
+            <input type="text" id="judul2" placeholder="Kosongkan jika hanya 1 buku">
+
+            <label>Penerbit Buku 2:</label>
+            <input type="text" id="penerbit2" placeholder="Kosongkan jika hanya 1 buku">
+
+            <label>Tahun Terbit Buku 2:</label>
+            <input type="number" id="tahunTerbit2" min="1900" max="2099" placeholder="Kosongkan jika hanya 1 buku">
+
+            <!-- UPLOAD FOTO BUKU 2 -->
+            <div class="upload-container">
+                <label class="upload-label">📷 FOTO BUKU 2</label>
+                <input type="file" id="fotoBuku2" class="file-input" accept="image/*" onchange="previewFoto(this, 'preview2')">
+                <img id="preview2" class="preview-image" alt="Preview Foto Buku 2">
+            </div>
+        </div>
+
+        <label>Jumlah Buku:</label>
+        <select id="jumlahBuku" required onchange="toggleBuku2()">
+            <option value="">Pilih Jumlah</option>
+            <option value="1">1 Buku</option>
+            <option value="2">2 Buku</option>
+        </select>
+
+        <label>Tanggal Pinjam:</label>
+        <input type="date" id="tanggalPinjam" required>
+
+        <label>Tanggal Pengembalian:</label>
+        <input type="date" id="tanggalKembali" required>
+
+        <button type="submit">Simpan</button>
+    </form>
+
+    <h3>Daftar Peminjaman</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Kode Pinjam</th>
+                <th>Nama</th>
+                <th>ISBN1</th>
+                <th>Judul1</th>
+                <th>Penerbit1</th>
+                <th>Tahun1</th>
+                <th>Foto1</th>
+                <th>ISBN2</th>
+                <th>Judul2</th>
+                <th>Penerbit2</th>
+                <th>Tahun2</th>
+                <th>Foto2</th>
+                <th>Jumlah</th>
+                <th>Tgl Pinjam</th>
+                <th>Tgl Kembali</th>
+                <th>Status</th>
+                <th>Denda</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="tabelData"></tbody>
+    </table>
+
+    <!-- Hubungkan file JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
