@@ -52,17 +52,16 @@ function toggleBuku2() {
         document.getElementById("tahunTerbit2").value = "";
         
         // Reset preview foto buku 2
-        const preview2 = document.getElementById('preview2');
-        if (preview2) {
-            preview2.src = '#';
-            preview2.classList.remove('show');
-        }
+        document.getElementById('preview2').src = '#';
+        document.getElementById('preview2').classList.remove('show');
         document.getElementById('fotoBuku2').value = '';
     }
 }
 
-// FUNGSI ASYNC UNTUK SIMPAN DATA
-function simpanData() {
+// EVENT LISTENER SUBMIT
+form.addEventListener("submit", function(e) {
+    e.preventDefault();
+
     // Ambil data buku 1
     const kodePinjam = document.getElementById("kodePinjam").value;
     const nama = document.getElementById("nama").value;
@@ -71,147 +70,131 @@ function simpanData() {
     const penerbit1 = document.getElementById("penerbit1").value;
     const tahunTerbit1 = document.getElementById("tahunTerbit1").value;
     
-    // Ambil data jumlah buku
-    const jumlahBuku = document.getElementById("jumlahBuku").value;
-    
-    // Ambil data buku 2
-    const isbn2 = jumlahBuku === "2" ? document.getElementById("isbn2").value : "";
-    const judul2 = jumlahBuku === "2" ? document.getElementById("judul2").value : "";
-    const penerbit2 = jumlahBuku === "2" ? document.getElementById("penerbit2").value : "";
-    const tahunTerbit2 = jumlahBuku === "2" ? document.getElementById("tahunTerbit2").value : "";
-    
-    const tanggalPinjam = document.getElementById("tanggalPinjam").value;
-    const tanggalKembali = document.getElementById("tanggalKembali").value;
-
-    // Validasi buku 2 jika jumlah 2
-    if (jumlahBuku === "2") {
-        if (!isbn2 || !judul2 || !penerbit2 || !tahunTerbit2) {
-            alert('Semua field buku kedua harus diisi!');
-            return false;
-        }
-    }
-
-    // Proses foto buku 1
+    // Ambil foto buku 1
     const foto1Input = document.getElementById("fotoBuku1");
     let foto1 = '';
-    
     if (foto1Input.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
             foto1 = e.target.result;
-            // Lanjut proses foto 2
-            prosesFoto2(foto1);
+            // Lanjutkan proses setelah foto di-load
+            prosesSimpan(foto1);
         }
         reader.readAsDataURL(foto1Input.files[0]);
     } else {
-        prosesFoto2('');
+        prosesSimpan('');
     }
     
-    function prosesFoto2(foto1Value) {
-        const foto2Input = document.getElementById("fotoBuku2");
-        let foto2 = '';
+    function prosesSimpan(foto1Value) {
+        // Ambil data buku 2 (jika ada)
+        const jumlahBuku = document.getElementById("jumlahBuku").value;
+        const isbn2 = jumlahBuku === "2" ? document.getElementById("isbn2").value : "";
+        const judul2 = jumlahBuku === "2" ? document.getElementById("judul2").value : "";
+        const penerbit2 = jumlahBuku === "2" ? document.getElementById("penerbit2").value : "";
+        const tahunTerbit2 = jumlahBuku === "2" ? document.getElementById("tahunTerbit2").value : "";
         
+        // Ambil foto buku 2
+        let foto2 = '';
+        const foto2Input = document.getElementById("fotoBuku2");
         if (jumlahBuku === "2" && foto2Input.files[0]) {
             const reader2 = new FileReader();
             reader2.onload = function(e) {
                 foto2 = e.target.result;
-                // Lanjut simpan data
-                simpanDataAkhir(foto1Value, foto2);
+                // Lanjutkan proses setelah foto 2 di-load
+                prosesSimpanLanjut(foto1Value, foto2);
             }
             reader2.readAsDataURL(foto2Input.files[0]);
         } else {
-            simpanDataAkhir(foto1Value, '');
-        }
-    }
-    
-    function simpanDataAkhir(foto1Value, foto2Value) {
-        const pinjamDate = new Date(tanggalPinjam);
-        const kembaliDate = new Date(tanggalKembali);
-
-        // Hitung selisih hari
-        let selisihHari = Math.ceil((kembaliDate - pinjamDate) / (1000 * 60 * 60 * 24));
-
-        let denda = 0;
-        let status = "Masih dalam batas waktu";
-
-        if (selisihHari > BATAS_HARI) {
-            let hariTelat = selisihHari - BATAS_HARI;
-            denda = hariTelat * DENDA_PER_HARI;
-            status = "Terlambat " + hariTelat + " hari";
-        }
-
-        if (sedangEdit === -1) {
-            // Tambah data baru
-            dataPeminjaman.push({
-                kodePinjam,
-                nama,
-                isbn1,
-                judul1,
-                penerbit1,
-                tahunTerbit1,
-                foto1: foto1Value,
-                isbn2,
-                judul2,
-                penerbit2,
-                tahunTerbit2,
-                foto2: foto2Value,
-                jumlahBuku,
-                tanggalPinjam,
-                tanggalKembali,
-                status,
-                denda
-            });
-        } else {
-            // Update data yang sedang diedit
-            dataPeminjaman[sedangEdit] = {
-                kodePinjam,
-                nama,
-                isbn1,
-                judul1,
-                penerbit1,
-                tahunTerbit1,
-                foto1: foto1Value,
-                isbn2,
-                judul2,
-                penerbit2,
-                tahunTerbit2,
-                foto2: foto2Value,
-                jumlahBuku,
-                tanggalPinjam,
-                tanggalKembali,
-                status,
-                denda
-            };
-            sedangEdit = -1;
-        }
-
-        tampilkanData();
-        form.reset();
-        
-        // Reset preview
-        const preview1 = document.getElementById('preview1');
-        const preview2 = document.getElementById('preview2');
-        if (preview1) {
-            preview1.src = '#';
-            preview1.classList.remove('show');
-        }
-        if (preview2) {
-            preview2.src = '#';
-            preview2.classList.remove('show');
+            prosesSimpanLanjut(foto1Value, '');
         }
         
-        toggleBuku2(); // Sembunyikan buku 2 setelah submit
-    }
-    
-    return true;
-}
+        function prosesSimpanLanjut(foto1Value, foto2Value) {
+            const tanggalPinjam = document.getElementById("tanggalPinjam").value;
+            const tanggalKembali = document.getElementById("tanggalKembali").value;
 
-// Event listener submit form
-form.addEventListener("submit", function(e) {
-    e.preventDefault();
-    simpanData();
+            // Validasi buku 2 jika jumlah 2
+            if (jumlahBuku === "2") {
+                if (!isbn2 || !judul2 || !penerbit2 || !tahunTerbit2) {
+                    alert('Semua field buku kedua harus diisi!');
+                    return;
+                }
+            }
+
+            const pinjamDate = new Date(tanggalPinjam);
+            const kembaliDate = new Date(tanggalKembali);
+
+            // Hitung selisih hari
+            let selisihHari = Math.ceil((kembaliDate - pinjamDate) / (1000 * 60 * 60 * 24));
+
+            let denda = 0;
+            let status = "Masih dalam batas waktu";
+
+            if (selisihHari > BATAS_HARI) {
+                let hariTelat = selisihHari - BATAS_HARI;
+                denda = hariTelat * DENDA_PER_HARI;
+                status = "Terlambat " + hariTelat + " hari";
+            }
+
+            if (sedangEdit === -1) {
+                // Tambah data baru
+                dataPeminjaman.push({
+                    kodePinjam,
+                    nama,
+                    isbn1,
+                    judul1,
+                    penerbit1,
+                    tahunTerbit1,
+                    foto1: foto1Value,
+                    isbn2,
+                    judul2,
+                    penerbit2,
+                    tahunTerbit2,
+                    foto2: foto2Value,
+                    jumlahBuku,
+                    tanggalPinjam,
+                    tanggalKembali,
+                    status,
+                    denda
+                });
+            } else {
+                // Update data yang sedang diedit
+                dataPeminjaman[sedangEdit] = {
+                    kodePinjam,
+                    nama,
+                    isbn1,
+                    judul1,
+                    penerbit1,
+                    tahunTerbit1,
+                    foto1: foto1Value,
+                    isbn2,
+                    judul2,
+                    penerbit2,
+                    tahunTerbit2,
+                    foto2: foto2Value,
+                    jumlahBuku,
+                    tanggalPinjam,
+                    tanggalKembali,
+                    status,
+                    denda
+                };
+                sedangEdit = -1;
+            }
+
+            tampilkanData();
+            form.reset();
+            
+            // Reset preview
+            document.getElementById('preview1').src = '#';
+            document.getElementById('preview1').classList.remove('show');
+            document.getElementById('preview2').src = '#';
+            document.getElementById('preview2').classList.remove('show');
+            
+            toggleBuku2(); // Sembunyikan buku 2 setelah submit
+        }
+    }
 });
 
+// FUNGSI HAPUS DATA
 function hapusData(index) {
     if (confirm('Yakin ingin menghapus data ini?')) {
         dataPeminjaman.splice(index, 1);
@@ -219,6 +202,7 @@ function hapusData(index) {
     }
 }
 
+// FUNGSI HAPUS SEMUA
 function hapusSemua() {
     if (confirm('Yakin ingin menghapus semua data?')) {
         dataPeminjaman = [];
@@ -226,6 +210,7 @@ function hapusSemua() {
     }
 }
 
+// FUNGSI EDIT DATA
 function editData(index) {
     const data = dataPeminjaman[index];
     
@@ -239,10 +224,9 @@ function editData(index) {
     document.getElementById("jumlahBuku").value = data.jumlahBuku;
     
     // Tampilkan preview foto 1 jika ada
-    const preview1 = document.getElementById('preview1');
-    if (data.foto1 && preview1) {
-        preview1.src = data.foto1;
-        preview1.classList.add('show');
+    if (data.foto1) {
+        document.getElementById('preview1').src = data.foto1;
+        document.getElementById('preview1').classList.add('show');
     }
     
     // Toggle dan isi buku 2 jika ada
@@ -254,10 +238,9 @@ function editData(index) {
         document.getElementById("tahunTerbit2").value = data.tahunTerbit2 || "";
         
         // Tampilkan preview foto 2 jika ada
-        const preview2 = document.getElementById('preview2');
-        if (data.foto2 && preview2) {
-            preview2.src = data.foto2;
-            preview2.classList.add('show');
+        if (data.foto2) {
+            document.getElementById('preview2').src = data.foto2;
+            document.getElementById('preview2').classList.add('show');
         }
     } else {
         // Pastikan buku 2 tersembunyi
@@ -270,6 +253,7 @@ function editData(index) {
     sedangEdit = index;
 }
 
+// FUNGSI TAMPILKAN DATA
 function tampilkanData() {
     tabelData.innerHTML = "";
 
@@ -285,7 +269,7 @@ function tampilkanData() {
                 <td>${data.tahunTerbit1}</td>
                 <td class="foto-cell">
                     ${data.foto1 ? 
-                        `<img src="${data.foto1}" class="foto-thumb" alt="foto buku1" style="width:50px; height:50px; object-fit:cover;">` : 
+                        `<img src="${data.foto1}" class="foto-thumb" alt="foto buku1">` : 
                         '<span class="no-foto">-</span>'}
                 </td>
                 <td>${data.isbn2 || '-'}</td>
@@ -294,7 +278,7 @@ function tampilkanData() {
                 <td>${data.tahunTerbit2 || '-'}</td>
                 <td class="foto-cell">
                     ${data.foto2 ? 
-                        `<img src="${data.foto2}" class="foto-thumb" alt="foto buku2" style="width:50px; height:50px; object-fit:cover;">` : 
+                        `<img src="${data.foto2}" class="foto-thumb" alt="foto buku2">` : 
                         '<span class="no-foto">-</span>'}
                 </td>
                 <td>${data.jumlahBuku}</td>
@@ -311,10 +295,7 @@ function tampilkanData() {
     });
 }
 
-// Update perhitungan saat tanggal berubah
-document.getElementById('tanggalPinjam').addEventListener('change', hitungLamaDenda);
-document.getElementById('tanggalKembali').addEventListener('change', hitungLamaDenda);
-
+// FUNGSI HITUNG LAMA DAN DENDA
 function hitungLamaDenda() {
     const tglPinjam = document.getElementById('tanggalPinjam').value;
     const tglKembali = document.getElementById('tanggalKembali').value;
@@ -330,8 +311,10 @@ function hitungLamaDenda() {
             if (lama > BATAS_HARI) {
                 denda = (lama - BATAS_HARI) * DENDA_PER_HARI;
             }
-            // Tampilkan denda di console (opsional)
-            console.log("Lama: " + lama + " hari, Denda: Rp " + denda);
         }
     }
 }
+
+// Event listener untuk hitung otomatis
+document.getElementById('tanggalPinjam').addEventListener('change', hitungLamaDenda);
+document.getElementById('tanggalKembali').addEventListener('change', hitungLamaDenda);
